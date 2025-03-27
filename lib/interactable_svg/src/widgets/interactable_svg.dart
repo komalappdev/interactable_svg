@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import './region_painter.dart';
+
 import '../models/region.dart';
 import '../parser.dart';
 import '../size_controller.dart';
+import './region_painter.dart';
 
 class InteractableSvg extends StatefulWidget {
   final bool _isFromWeb;
@@ -22,10 +23,12 @@ class InteractableSvg extends StatefulWidget {
   final bool? centerTextEnable;
   final bool? isMultiSelectable;
   final TextStyle? centerTextStyle;
+  final Map<String, Color>? regionColorMap;
 
   const InteractableSvg({
     Key? key,
     required this.svgAddress,
+    this.regionColorMap,
     required this.onChanged,
     this.width,
     this.height,
@@ -60,7 +63,8 @@ class InteractableSvg extends StatefulWidget {
       this.centerTextEnable,
       this.centerTextStyle,
       this.toggleEnable,
-      this.isMultiSelectable})
+      this.isMultiSelectable,
+      this.regionColorMap})
       : _isFromWeb = true,
         _isString = false,
         super(key: key);
@@ -80,7 +84,8 @@ class InteractableSvg extends StatefulWidget {
       this.centerTextEnable,
       this.centerTextStyle,
       this.toggleEnable,
-      this.isMultiSelectable})
+      this.isMultiSelectable,
+      this.regionColorMap})
       : _isFromWeb = false,
         _isString = true,
         fileName = "",
@@ -147,16 +152,17 @@ class InteractableSvgState extends State<InteractableSvg> {
       child: CustomPaint(
         isComplex: true,
         foregroundPainter: RegionPainter(
-            region: region,
-            selectedRegion: selectedRegion,
-            dotColor: widget.dotColor,
-            selectedColor: widget.selectedColor,
-            strokeColor: widget.strokeColor,
-            centerDotEnable: widget.centerDotEnable,
-            centerTextEnable: widget.centerTextEnable,
-            centerTextStyle: widget.centerTextStyle,
-            strokeWidth: widget.strokeWidth,
-            unSelectableId: widget.unSelectableId),
+          region: region,
+          selectedRegion: selectedRegion,
+          dotColor: widget.dotColor,
+          selectedColor: widget.regionColorMap?[region.id] ?? widget.selectedColor,
+          strokeColor: widget.strokeColor,
+          centerDotEnable: widget.centerDotEnable,
+          centerTextEnable: widget.centerTextEnable,
+          centerTextStyle: widget.centerTextStyle,
+          strokeWidth: widget.strokeWidth,
+          unSelectableId: widget.unSelectableId,
+        ),
         child: Container(
           width: widget.width ?? double.infinity,
           height: widget.height ?? double.infinity,
