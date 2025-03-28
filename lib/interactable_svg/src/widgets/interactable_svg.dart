@@ -24,6 +24,7 @@ class InteractableSvg extends StatefulWidget {
   final bool? isMultiSelectable;
   final TextStyle? centerTextStyle;
   final Map<String, Color>? regionColorMap;
+  final bool? isInteractive;
 
   const InteractableSvg({
     Key? key,
@@ -42,51 +43,54 @@ class InteractableSvg extends StatefulWidget {
     this.centerTextStyle,
     this.toggleEnable,
     this.isMultiSelectable,
+    this.isInteractive = true,
   })  : _isFromWeb = false,
         _isString = false,
         fileName = "",
         super(key: key);
 
-  const InteractableSvg.network(
-      {required this.fileName,
-      Key? key,
-      required this.svgAddress,
-      required this.onChanged,
-      this.width,
-      this.height,
-      this.strokeColor,
-      this.strokeWidth,
-      this.selectedColor,
-      this.dotColor,
-      this.unSelectableId,
-      this.centerDotEnable,
-      this.centerTextEnable,
-      this.centerTextStyle,
-      this.toggleEnable,
-      this.isMultiSelectable,
-      this.regionColorMap})
-      : _isFromWeb = true,
+  const InteractableSvg.network({
+    required this.fileName,
+    Key? key,
+    required this.svgAddress,
+    required this.onChanged,
+    this.width,
+    this.height,
+    this.strokeColor,
+    this.strokeWidth,
+    this.selectedColor,
+    this.dotColor,
+    this.unSelectableId,
+    this.centerDotEnable,
+    this.centerTextEnable,
+    this.centerTextStyle,
+    this.toggleEnable,
+    this.isMultiSelectable,
+    this.regionColorMap,
+    this.isInteractive = true,
+  })  : _isFromWeb = true,
         _isString = false,
         super(key: key);
 
-  const InteractableSvg.string(
-      {Key? key,
-      required this.svgAddress,
-      required this.onChanged,
-      this.width,
-      this.height,
-      this.strokeColor,
-      this.strokeWidth,
-      this.selectedColor,
-      this.dotColor,
-      this.unSelectableId,
-      this.centerDotEnable,
-      this.centerTextEnable,
-      this.centerTextStyle,
-      this.toggleEnable,
-      this.isMultiSelectable,
-      this.regionColorMap})
-      : _isFromWeb = false,
+  const InteractableSvg.string({
+    Key? key,
+    required this.svgAddress,
+    required this.onChanged,
+    this.width,
+    this.height,
+    this.strokeColor,
+    this.strokeWidth,
+    this.selectedColor,
+    this.dotColor,
+    this.unSelectableId,
+    this.centerDotEnable,
+    this.centerTextEnable,
+    this.centerTextStyle,
+    this.toggleEnable,
+    this.isMultiSelectable,
+    this.regionColorMap,
+    this.isInteractive = true,
+  })  : _isFromWeb = false,
         _isString = true,
         fileName = "",
         super(key: key);
@@ -146,16 +150,25 @@ class InteractableSvgState extends State<InteractableSvg> {
   Widget _buildStackItem(Region region) {
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
-      onTap: () => (widget.toggleEnable ?? false)
+      onTap: () {
+        if (!(widget.isInteractive ?? true)) return;
+        if ((widget.toggleEnable ?? false)) {
+          toggleButton(region);
+        } else {
+          holdButton(region);
+        }
+      },
+      /*onTap: () => (widget.toggleEnable ?? false)
           ? toggleButton(region)
-          : holdButton(region),
+          : holdButton(region),*/
       child: CustomPaint(
         isComplex: true,
         foregroundPainter: RegionPainter(
           region: region,
           selectedRegion: selectedRegion,
           dotColor: widget.dotColor,
-          selectedColor: widget.regionColorMap?[region.id] ?? widget.selectedColor,
+          selectedColor:
+              widget.regionColorMap?[region.id] ?? widget.selectedColor,
           strokeColor: widget.strokeColor,
           centerDotEnable: widget.centerDotEnable,
           centerTextEnable: widget.centerTextEnable,
